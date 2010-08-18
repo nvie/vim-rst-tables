@@ -3,7 +3,6 @@ import re
 from vim_bridge import bridged
 
 
-@bridged  # {{{
 def get_table_bounds():
     row, col = vim.current.window.cursor
     upper = lower = row
@@ -24,7 +23,6 @@ def get_table_bounds():
         lower -= 1
 
     return (upper, lower)
-    # }}}
 
 
 def unify_table(table):
@@ -119,21 +117,10 @@ def draw_table(table):
     return output
 
 
+@bridged
 def create_table():
     upper, lower = get_table_bounds()
     slice = vim.current.buffer[upper - 1:lower]
-    slice = """\
-+==========+================================================================================================+
-| Column 1 | Column 2                                                                                       |
-+==========+================================================================================================+
-| Foo      | Put two (or more) spaces as a field separator.                                                 |
-+----------+------------------------------------------------------------------------------------------------+
-| Bar      | Even very very long lines like these are fine, as long as you do not put in line endings here. |
-+----------+------------------------------------------------------------------------------------------------+
-| Qux      | This is the last line.                                                                         |
-+----------+------------------------------------------------------------------------------------------------+
-""".strip().split('\n')
-
-    #table = parse_table(slice)
-    #slice = draw_table(table)
+    table = parse_table(slice)
+    slice = draw_table(table)
     vim.current.buffer[upper - 1:lower] = slice
