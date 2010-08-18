@@ -40,19 +40,19 @@ a line ending.
 
     def testGetBounds(self):
         input = self.plain
-        vim.buffer = input.split('\n')
+        vim.current.buffer = input.split('\n')
         vim.current.window.cursor = (4, 0)
         self.assertEquals((3, 6), get_table_bounds())
 
     def testGetBoundsOnBeginOfFile(self):
         input = self.plain
-        vim.buffer = input.split('\n')
+        vim.current.buffer = input.split('\n')
         vim.current.window.cursor = (1, 0)
         self.assertEquals((1, 1), get_table_bounds())
 
     def testGetBoundsOnEndOfFile(self):
         input = self.plain
-        vim.buffer = input.split('\n')
+        vim.current.buffer = input.split('\n')
         vim.current.window.cursor = (8, 0)
         self.assertEquals((8, 9), get_table_bounds())
 
@@ -63,14 +63,14 @@ a line ending.
 
     def testParseTable(self):
         input = self.plain
-        vim.buffer = input.split('\n')
+        vim.current.buffer = input.split('\n')
         expected = [
                 ['Column 1', 'Column 2'],
                 ['Foo', 'Put two (or more) spaces as a field separator.'],
                 ['Bar', 'Even very very long lines like these are fine, as long as you do not put in line endings here.'],
                 ['Qux', 'This is the last line.'],
                 ]
-        self.assertEquals(expected, parse_table(vim.buffer[2:6]))
+        self.assertEquals(expected, parse_table(vim.current.buffer[2:6]))
 
     def testParseTableUnifiesColumns(self):
         input = ['x  y', 'a  b    c', 'only one']
@@ -141,7 +141,7 @@ This is paragraph text *before* the table.
 This is paragraph text *after* the table, with
 a line ending.
 """.split('\n')
-        vim.buffer = input.split('\n')
+        vim.current.buffer = input.split('\n')
         vim.current.window.cursor = (4, 10)
         create_table()
-        self.assertEquals(expect, vim.buffer)
+        self.assertEquals(expect, vim.current.buffer)

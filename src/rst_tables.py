@@ -8,7 +8,7 @@ def get_table_bounds():
     row, col = vim.current.window.cursor
     upper = lower = row
     try:
-        while vim.buffer[upper - 1].strip():
+        while vim.current.buffer[upper - 1].strip():
             upper -= 1
     except IndexError:
         pass
@@ -16,7 +16,7 @@ def get_table_bounds():
         upper += 1
 
     try:
-        while vim.buffer[lower - 1].strip():
+        while vim.current.buffer[lower - 1].strip():
             lower += 1
     except IndexError:
         pass
@@ -121,7 +121,7 @@ def draw_table(table):
 
 def create_table():
     upper, lower = get_table_bounds()
-    slice = vim.buffer[upper - 1:lower]
+    slice = vim.current.buffer[upper - 1:lower]
     slice = """\
 +==========+================================================================================================+
 | Column 1 | Column 2                                                                                       |
@@ -136,4 +136,4 @@ def create_table():
 
     #table = parse_table(slice)
     #slice = draw_table(table)
-    vim.buffer[upper - 1:lower] = slice
+    vim.current.buffer[upper - 1:lower] = slice
