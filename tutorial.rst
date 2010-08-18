@@ -6,6 +6,7 @@ Feature  Description
 Easy  It's soo easy, man.
 Predictable        Amount of spaces doesn't matter.
 Repeatable  It can be repeated.
+Flexible  Even spaces at the end of a line are fine.                 
 
 Then, the paragraph should turn into:
 

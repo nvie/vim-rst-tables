@@ -52,7 +52,7 @@ def unify_table(table):
 
 
 def parse_table(raw_lines):
-    mkfields = lambda line: re.split('\s\s+', line)
+    mkfields = lambda line: re.split('\s\s+', line.rstrip())
     output = map(mkfields, raw_lines)
     output = unify_table(output)
     return output

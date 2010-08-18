@@ -77,6 +77,11 @@ a line ending.
         expected = [['x', 'y', ''], ['a', 'b', 'c'], ['only one', '', '']]
         self.assertEquals(expected, parse_table(input))
 
+    def testParseDealsWithSpacesAtLineEnd(self):
+        input = ['x  y     ', 'a  b ', 'only one']
+        expected = [['x', 'y'], ['a', 'b'], ['only one', '']]
+        self.assertEquals(expected, parse_table(input))
+
     def testTableLine(self):
         self.assertEquals('', table_line([], True))
         self.assertEquals('++', table_line([0], True))
