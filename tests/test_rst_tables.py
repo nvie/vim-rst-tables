@@ -22,7 +22,7 @@ import unittest
 # Load test subjects
 from rst_tables import get_table_bounds, create_table, parse_table, \
                           draw_table, table_line, get_column_widths, \
-                          pad_fields
+                          pad_fields, unify_table
 
 class TestRSTTableFormatter(unittest.TestCase):
 
@@ -75,6 +75,16 @@ class TestRSTTableFormatter(unittest.TestCase):
         expected = [['x', 'y', ''], ['a', 'b', 'c'], ['only one', '', '']]
         self.assertEquals(expected, parse_table(input))
 
+    def testUnifyTables(self):
+        input = [[' x ', '  y'], ['xxx', ' yyyy ', 'zz']]
+        expected = [[' x ', '  y', ''], ['xxx', ' yyyy ', 'zz']]
+        self.assertEquals(expected, unify_table(input))
+
+    def testUnifyTablesRemovesEmptyColumns(self):
+        input = [['x', '', 'y'], ['xxx', '', 'yyyy', 'zz', '         ']]
+        expected = [['x', 'y', ''], ['xxx', 'yyyy', 'zz']]
+        self.assertEquals(expected, unify_table(input))
+
     def testParseDealsWithSpacesAtLineEnd(self):
         input = ['x  y     ', 'a  b ', 'only one']
         expected = [['x', 'y'], ['a', 'b'], ['only one', '']]
@@ -107,9 +117,9 @@ class TestRSTTableFormatter(unittest.TestCase):
                  '| x   | This became somewhat larger  |',
                  'blah   | A new line|| ',
                  '+-----+----+']
-        expect = [['Foo', 'Mu', ''],
-                  ['x', 'This became somewhat larger', ''],
-                  ['blah', 'A new line', '']]
+        expect = [['Foo', 'Mu'],
+                  ['x', 'This became somewhat larger'],
+                  ['blah', 'A new line']]
         self.assertEquals(expect, parse_table(input))
 
     def testTableLine(self):

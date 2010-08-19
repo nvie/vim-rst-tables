@@ -47,12 +47,12 @@ Feature| Description                                 |
 Ease of use | Drop dead simple!
 Foo | Bar, qux, mux
 Predictability | Deploykdj sfkljsdjf ljdflsk jsdflkj dsflkj sdlkj dfslkj
- | dfslkjds flkdjsfl sdfjlk jdfslk djsfl dfjslk jsdflk jfdslk jdfslkds fjlkds
- | jldkfj ldfsjlsd jldsf jlkjds flds fjlk jdflk jdsflj dslfjs dlfj sdflkj sdlfj
- |dfslkjds flkdjsfl sdfjlk jdfslk djsfl dfjslk jsdflk jfdslk jdfslkds fjlkds
- |jldkfj ldfsjlsd jldsf jlkjds flds fjlk jdflk jdsflj dslfjs dlfj sdflkj sdlfj
- |dfslkjds flkdjsfl sdfjlk jdfslk djsfl dfjslk jsdflk jfdslk jdfslkds fjlkds
- |jldkfj ldfsjlsd jldsf jlkjds flds fjlk jdflk jdsflj dslfjs dlfj sdflkj sdlfj
- |ldfsj dlfsj dfskjdfs ldsfj 
+| | dfslkjds flkdjsfl sdfjlk jdfslk djsfl dfjslk jsdflk jfdslk jdfslkds fjlkds
+| | jldkfj ldfsjlsd jldsf jlkjds flds fjlk jdflk jdsflj dslfjs dlfj sdflkj sdlfj
+| |dfslkjds flkdjsfl sdfjlk jdfslk djsfl dfjslk jsdflk jfdslk jdfslkds fjlkds
+| |jldkfj ldfsjlsd jldsf jlkjds flds fjlk jdflk jdsflj dslfjs dlfj sdflkj sdlfj
+| |dfslkjds flkdjsfl sdfjlk jdfslk djsfl dfjslk jsdflk jfdslk jdfslkds fjlkds
+| |jldkfj ldfsjlsd jldsf jlkjds flds fjlk jdflk jdsflj dslfjs dlfj sdflkj sdlfj | 
+| |ldfsj dlfsj dfskjdfs ldsfj 
 
 And some para-text below it.

@@ -27,12 +27,30 @@ def get_table_bounds():
 
 def unify_table(table):
     max_fields = max(map(lambda row: len(row), table))
+    empty_cols = [True] * max_fields
     output = []
     for row in table:
         curr_len = len(row)
         if curr_len < max_fields:
             row += [''] * (max_fields - curr_len)
         output.append(row)
+
+        # register empty columns (to be removed at the end)
+        for i in range(len(row)):
+            if row[i].strip():
+                empty_cols[i] = False
+
+    # remove empty columns from all rows
+    table = output
+    output = []
+    for row in table:
+        cols = []
+        for i in range(len(row)):
+            should_remove = empty_cols[i]
+            if not should_remove:
+                cols.append(row[i])
+        output.append(cols)
+
     return output
 
 
