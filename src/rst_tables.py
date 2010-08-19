@@ -47,6 +47,7 @@ def join_rows(rows, sep='\n'):
 def line_is_separator(line):
     return re.match('^[\t +=-]+$', line)
 
+
 def has_line_seps(raw_lines):
     for line in raw_lines:
         if line_is_separator(line):
@@ -138,6 +139,25 @@ def table_line(widths, header=False):
     return sep.join(parts)
 
 
+def get_field_width(field_text):
+    return max(map(lambda s: len(s), field_text.split('\n')))
+
+
+def split_row_into_lines(row):
+    row = map(lambda field: field.split('\n'), row)
+    height = max(map(lambda field_lines: len(field_lines), row))
+    turn_table = []
+    for i in range(height):
+        fields = []
+        for field_lines in row:
+            if i < len(field_lines):
+                fields.append(field_lines[i])
+            else:
+                fields.append('')
+        turn_table.append(fields)
+    return turn_table
+
+
 def get_column_widths(table):
     widths = []
     for row in table:
@@ -147,30 +167,25 @@ def get_column_widths(table):
             widths.extend([0] * (num_fields - len(widths)))
         for i in range(num_fields):
             field_text = row[i]
-            field_width = len(field_text)
+            field_width = get_field_width(field_text)
             widths[i] = max(widths[i], field_width)
     return widths
 
 
-def pad_fields(table, widths=None):
-    """Pads fields of the table, so each row lines up nicely with the others.
-    If the widths param is None, the widths are calculated automatically.
+def pad_fields(row, widths):
+    """Pads fields of the given row, so each field lines up nicely with the
+    others.
 
     """
-    if widths is None:
-        widths = get_column_widths(table)
     widths = map(lambda w: ' %-' + str(w) + 's ', widths)
 
     # Pad all fields using the calculated widths
-    output = []
-    for row in table:
-        new_row = []
-        for i in range(len(row)):
-            col = row[i]
-            col = widths[i] % col.strip()
-            new_row.append(col)
-        output.append(new_row)
-    return output
+    new_row = []
+    for i in range(len(row)):
+        col = row[i]
+        col = widths[i] % col.strip()
+        new_row.append(col)
+    return new_row
 
 
 def draw_table(table):
@@ -178,17 +193,24 @@ def draw_table(table):
         return []
 
     col_widths = get_column_widths(table)
-    table = pad_fields(table, col_widths)
 
     # Reserve room for the spaces
-    col_widths = map(lambda x: x + 2, col_widths)
-    header_line = table_line(col_widths, header=True)
-    normal_line = table_line(col_widths, header=False)
+    sep_col_widths = map(lambda x: x + 2, col_widths)
+    header_line = table_line(sep_col_widths, header=True)
+    normal_line = table_line(sep_col_widths, header=False)
 
     output = [header_line]
     first = True
     for row in table:
-        output.append("|".join([''] + row + ['']))
+
+        row_lines = split_row_into_lines(row)
+
+        # draw the lines (num_lines) for this row
+        for row_line in row_lines:
+            row_line = pad_fields(row_line, col_widths)
+            output.append("|".join([''] + row_line + ['']))
+
+        # then, draw the separator
         if first:
             output.append(header_line)
             first = False

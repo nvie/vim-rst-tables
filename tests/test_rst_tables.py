@@ -23,7 +23,7 @@ import unittest
 from rst_tables import get_table_bounds, reformat_table, parse_table, \
                           draw_table, table_line, get_column_widths, \
                           pad_fields, unify_table, join_rows, \
-                          partition_raw_lines
+                          partition_raw_lines, split_row_into_lines
 
 class TestRSTTableFormatter(unittest.TestCase):
 
@@ -146,6 +146,43 @@ class TestRSTTableFormatter(unittest.TestCase):
                   ['x\nblah', 'This became somewhat larger\nA new line']]
         self.assertEquals(expect, parse_table(input))
 
+    def testParseMultiLineFields(self):
+        input = """\
++=====+=====================+
+| Foo | Bar                 |
++=====+=====================+
+| x   | This is a long line |
+|     | that is spread out  |
+|     | over multiple lines |
++-----+---------------------+""".split('\n')
+        expect = [['Foo', 'Bar'],
+                  ['x', 'This is a long line\nthat is spread out\nover multiple lines']]
+        self.assertEquals(expect, parse_table(input))
+
+    def testSplitRowIntoLines(self):
+        input = ['Foo', 'Bar']
+        expect = [['Foo', 'Bar']]
+        self.assertEquals(expect, split_row_into_lines(input))
+        input = ['One\nTwo\nThree', 'Only one']
+        expect = [['One', 'Only one'], ['Two', ''], ['Three', '']]
+        self.assertEquals(expect, split_row_into_lines(input))
+        input = ['One\n\n\nThree', 'Foo\nBar']
+        expect = [['One', 'Foo'], ['', 'Bar'], ['', ''], ['Three', '']]
+        self.assertEquals(expect, split_row_into_lines(input))
+
+    def testDrawMultiLineFields(self):
+        input = [['Foo', 'Bar'],
+                  ['x', 'This is a long line\nthat is spread out\nover multiple lines']]
+        expect = """\
++=====+=====================+
+| Foo | Bar                 |
++=====+=====================+
+| x   | This is a long line |
+|     | that is spread out  |
+|     | over multiple lines |
++-----+---------------------+""".split('\n')
+        self.assertEquals(expect, draw_table(input))
+
     def testTableLine(self):
         self.assertEquals('', table_line([], True))
         self.assertEquals('++', table_line([0], True))
@@ -168,6 +205,11 @@ class TestRSTTableFormatter(unittest.TestCase):
                         ['xx','yyy','zz'],
                     ]))
 
+    def testGetColumnWidthsForMultiLineFields(self):
+        self.assertEquals([3,6],
+                get_column_widths([['Foo\nBar\nQux',
+                                    'This\nis\nreally\nneat!']]))
+
     def testPadFields(self):
         table = [['Name', 'Type', 'Description'],
                  ['Lollypop', 'Candy', 'Yummy'],
@@ -176,7 +218,9 @@ class TestRSTTableFormatter(unittest.TestCase):
                  [' Name     ', ' Type   ', ' Description                  '],
                  [' Lollypop ', ' Candy  ', ' Yummy                        '],
                  [' Crisps   ', ' Snacks ', ' Even more yummy, I tell you! ']]
-        self.assertEquals(expected_padding, pad_fields(table))
+        widths = get_column_widths(table)
+        for input, expect in zip(table, expected_padding):
+            self.assertEquals(expect, pad_fields(input, widths))
 
 
     def testDrawTable(self):
