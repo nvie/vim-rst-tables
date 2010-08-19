@@ -63,6 +63,37 @@ def join_rows(rows, sep='\n'):
     return map(lambda lines: sep.join(lines), output)
 
 
+def line_is_separator(line):
+    return re.match('^[\t +=-]+$', line)
+
+def has_line_seps(raw_lines):
+    for line in raw_lines:
+        if line_is_separator(line):
+            return True
+    return False
+
+
+def partition_raw_lines(raw_lines):
+    """Partitions a list of raw input lines so that between each partition, a
+    table row separator can be placed.
+
+    """
+    if not has_line_seps(raw_lines):
+        return map(lambda x: [x], raw_lines)
+
+    curr_part = []
+    parts = [curr_part]
+    for line in raw_lines:
+        if line_is_separator(line):
+            curr_part = []
+            parts.append(curr_part)
+        else:
+            curr_part.append(line)
+
+    # remove any empty partitions (typically the first and last ones)
+    return filter(lambda x: x != [], parts)
+
+
 def unify_table(table):
     """Given a list of rows (i.e. a table), this function returns a new table
     in which all rows have an equal amount of columns.  If all full column is
@@ -106,9 +137,9 @@ def split_table_row(row_string):
 
 
 def parse_table(raw_lines):
-    select_data_lines = lambda line: not re.match('^[\t +=-]+$', line)
-    lines = filter(select_data_lines, raw_lines)
-    lines = map(split_table_row, lines)
+    row_partition = partition_raw_lines(raw_lines)
+    lines = map(lambda row_string: join_rows(map(split_table_row, row_string)),
+                row_partition)
     return unify_table(lines)
 
 

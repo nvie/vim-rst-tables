@@ -22,7 +22,8 @@ import unittest
 # Load test subjects
 from rst_tables import get_table_bounds, reformat_table, parse_table, \
                           draw_table, table_line, get_column_widths, \
-                          pad_fields, unify_table, join_rows
+                          pad_fields, unify_table, join_rows, \
+                          partition_raw_lines
 
 class TestRSTTableFormatter(unittest.TestCase):
 
@@ -66,6 +67,19 @@ class TestRSTTableFormatter(unittest.TestCase):
         input_rows.append(['apple', '', 'pear'])
         expected = ['x foo apple', 'y bar', 'z pear']
         self.assertEquals(expected, join_rows(input_rows, sep=' '))
+
+    def testPartitionRawLines(self):
+        self.assertEquals([], partition_raw_lines([]))
+        self.assertEquals([['']], partition_raw_lines(['']))
+        self.assertEquals(
+                [['foo'], ['bar']],
+                partition_raw_lines(['foo', 'bar']))
+        self.assertEquals(
+                [['foo'], ['bar']],
+                partition_raw_lines(['foo', '+----+', 'bar']))
+        self.assertEquals(
+                [['foo', 'bar'], ['baz']],
+                partition_raw_lines(['+-----+', 'foo', 'bar', '----', 'baz']))
 
     def testParseSimpleTable(self):
         self.assertEquals([['x y z']], parse_table(['x y z']))
@@ -119,8 +133,7 @@ class TestRSTTableFormatter(unittest.TestCase):
                  'blah   | A new line| ',
                  '+-----+----+']
         expect = [['Foo', 'Mu'],
-                  ['x', 'This became somewhat larger'],
-                  ['blah', 'A new line']]
+                  ['x\nblah', 'This became somewhat larger\nA new line']]
         self.assertEquals(expect, parse_table(input))
 
         input = ['+===+-----====+',
@@ -130,8 +143,7 @@ class TestRSTTableFormatter(unittest.TestCase):
                  'blah   | A new line|| ',
                  '+-----+----+']
         expect = [['Foo', 'Mu'],
-                  ['x', 'This became somewhat larger'],
-                  ['blah', 'A new line']]
+                  ['x\nblah', 'This became somewhat larger\nA new line']]
         self.assertEquals(expect, parse_table(input))
 
     def testTableLine(self):
