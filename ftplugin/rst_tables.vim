@@ -5,6 +5,10 @@
 " Version:      Vim 7 (may work with lower Vim versions, but not tested)
 " URL:          http://github.com/nvie/vim-rst-tables
 "
+" This plugin is a more flexible reimplementation of the ideas and the
+" existing Vim plugin by Hugo Ruscitti:
+"   http://www.vim.org/scripts/script.php?script_id=3041
+"
 
 " Only do this when not done yet for this buffer
 if exists("g:loaded_rst_tables_ftplugin")
@@ -183,7 +187,7 @@ def draw_table(table):
 
 
 @bridged
-def create_table():
+def reformat_table():
     upper, lower = get_table_bounds()
     slice = vim.current.buffer[upper - 1:lower]
     table = parse_table(slice)
@@ -195,9 +199,6 @@ endpython
 " Add mappings, unless the user didn't want this.
 " The default mapping is registered, unless the user remapped it already.
 if !exists("no_plugin_maps") && !exists("no_rst_table_maps")
-    if !hasmapto('CreateTable(')
-        noremap <silent> <leader><leader>c :call CreateTable()<CR>
-    endif
     if !hasmapto('ReformatTable(')
         noremap <silent> <leader><leader>f :call ReformatTable()<CR>
     endif

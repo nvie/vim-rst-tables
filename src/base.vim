@@ -5,6 +5,10 @@
 " Version:      Vim 7 (may work with lower Vim versions, but not tested)
 " URL:          http://github.com/nvie/vim-rst-tables
 "
+" This plugin is a more flexible reimplementation of the ideas and the
+" existing Vim plugin by Hugo Ruscitti:
+"   http://www.vim.org/scripts/script.php?script_id=3041
+"
 
 " Only do this when not done yet for this buffer
 if exists("g:loaded_rst_tables_ftplugin")
