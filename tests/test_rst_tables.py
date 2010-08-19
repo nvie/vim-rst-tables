@@ -22,7 +22,7 @@ import unittest
 # Load test subjects
 from rst_tables import get_table_bounds, create_table, parse_table, \
                           draw_table, table_line, get_column_widths, \
-                          pad_fields, unify_table
+                          pad_fields, unify_table, join_rows
 
 class TestRSTTableFormatter(unittest.TestCase):
 
@@ -57,6 +57,15 @@ class TestRSTTableFormatter(unittest.TestCase):
         self.load_fixture_in_vim('default')
         vim.current.window.cursor = (8, 0)
         self.assertEquals((8, 9), get_table_bounds())
+
+    def testJoinSimpleRows(self):
+        input_rows = [['x', 'y', 'z'], ['foo', 'bar']]
+        expected = ['x\nfoo', 'y\nbar', 'z']
+        self.assertEquals(expected, join_rows(input_rows))
+
+        input_rows.append(['apple', '', 'pear'])
+        expected = ['x foo apple', 'y bar', 'z pear']
+        self.assertEquals(expected, join_rows(input_rows, sep=' '))
 
     def testParseSimpleTable(self):
         self.assertEquals([['x y z']], parse_table(['x y z']))
@@ -191,3 +200,22 @@ a line ending.
 """.split('\n')
         create_table()
         self.assertEquals(expect, vim.current.buffer)
+
+    def notestCreateComplexTable(self):
+        raw_lines = self.read_fixture('multiline-cells')
+        expect = """
++================+===============================================================+
+| Feature        | Description                                                   |
++================+===============================================================+
+| Ease of use    | Drop dead simple!                                             |
++----------------+---------------------------------------------------------------+
+| Foo            | Bar, qux, mux                                                 |
++----------------+---------------------------------------------------------------+
+| Predictability | Lorem ipsum dolor sit amet, consectetur adipiscing elit.      |
++----------------+---------------------------------------------------------------+
+|                | Nullam congue dapibus aliquet. Integer ut rhoncus leo. In hac |
++----------------+---------------------------------------------------------------+
+|                | habitasse platea dictumst. Phasellus pretium iaculis.         |
++----------------+---------------------------------------------------------------+
+""".strip().split('\n')
+        self.assertEquals(expect, draw_table(parse_table(raw_lines)))

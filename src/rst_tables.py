@@ -24,8 +24,32 @@ def get_table_bounds():
 
     return (upper, lower)
 
+def join_rows(rows, sep='\n'):
+    """Given a list of rows (a list of lists) this function returns a
+    flattened list where each the individual columns of all rows are joined
+    together using the line separator.
+
+    """
+    output = []
+    for row in rows:
+        # grow output array, if necessary
+        if len(output) <= len(row):
+            for i in range(len(row) - len(output)):
+                output.extend([[]])
+
+        for i, field in enumerate(row):
+            field_text = field.strip()
+            if field_text:
+                output[i].append(field_text)
+    return map(lambda lines: sep.join(lines), output)
+
 
 def unify_table(table):
+    """Given a list of rows (i.e. a table), this function returns a new table
+    in which all rows have an equal amount of columns.  If all full column is
+    empty (i.e. all rows have that field empty), the column is removed.
+
+    """
     max_fields = max(map(lambda row: len(row), table))
     empty_cols = [True] * max_fields
     output = []
