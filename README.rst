@@ -32,7 +32,7 @@ Usage
       This is paragraph text *after* the table.
 
 2. Put your cursor somewhere in the table.
-3. Press ``,,c`` (to create the table).  The output will look something like
+3. Press ``,,f`` (to create the table).  The output will look something like
    this:
 
    .. code_block:: rst
