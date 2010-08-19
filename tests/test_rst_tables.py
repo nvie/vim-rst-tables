@@ -15,7 +15,11 @@ vim.eval = fake_eval
 vim.current = mock.Mock()
 vimvar['foo'] = 'bar'
 
+# Begin normal module loading
+import os
 import unittest
+
+# Load test subjects
 from rst_tables import get_table_bounds, create_table, parse_table, \
                           draw_table, table_line, get_column_widths, \
                           pad_fields
@@ -23,36 +27,31 @@ from rst_tables import get_table_bounds, create_table, parse_table, \
 class TestRSTTableFormatter(unittest.TestCase):
 
     def setUp(self):
-        self.plain = """\
-This is paragraph text *before* the table.
-
-Column 1  Column 2
-Foo  Put two (or more) spaces as a field separator.
-Bar  Even very very long lines like these are fine, as long as you do not put in line endings here.
-Qux  This is the last line.
-
-This is paragraph text *after* the table, with
-a line ending.
-"""
+        # Default vim cursor for all tests is at line 4
+        vim.current = mock.Mock()
+        vim.current.window.cursor = (4, 0)
 
     def tearDown(self):
-        pass
+        del vim.current
+
+    def read_fixture(self, name):
+        return open(os.path.join('tests/fixtures/', name + '.txt'),
+                    'r').read().split('\n')
+
+    def load_fixture_in_vim(self, name):
+        vim.current.buffer = self.read_fixture(name)
 
     def testGetBounds(self):
-        input = self.plain
-        vim.current.buffer = input.split('\n')
-        vim.current.window.cursor = (4, 0)
+        self.load_fixture_in_vim('default')
         self.assertEquals((3, 6), get_table_bounds())
 
     def testGetBoundsOnBeginOfFile(self):
-        input = self.plain
-        vim.current.buffer = input.split('\n')
+        self.load_fixture_in_vim('default')
         vim.current.window.cursor = (1, 0)
         self.assertEquals((1, 1), get_table_bounds())
 
     def testGetBoundsOnEndOfFile(self):
-        input = self.plain
-        vim.current.buffer = input.split('\n')
+        self.load_fixture_in_vim('default')
         vim.current.window.cursor = (8, 0)
         self.assertEquals((8, 9), get_table_bounds())
 
@@ -62,8 +61,7 @@ a line ending.
         self.assertEquals([['x', 'y', 'z']], parse_table(['x  y          z']))
 
     def testParseTable(self):
-        input = self.plain
-        vim.current.buffer = input.split('\n')
+        self.load_fixture_in_vim('default')
         expected = [
                 ['Column 1', 'Column 2'],
                 ['Foo', 'Put two (or more) spaces as a field separator.'],
@@ -161,7 +159,7 @@ a line ending.
                 draw_table([['Foo', 'Mu'], ['x', 'y']]))
 
     def testCreateTable(self):
-        input = self.plain
+        self.load_fixture_in_vim('default')
         expect = """\
 This is paragraph text *before* the table.
 
@@ -178,7 +176,6 @@ This is paragraph text *before* the table.
 This is paragraph text *after* the table, with
 a line ending.
 """.split('\n')
-        vim.current.buffer = input.split('\n')
         vim.current.window.cursor = (4, 10)
         create_table()
         self.assertEquals(expect, vim.current.buffer)
