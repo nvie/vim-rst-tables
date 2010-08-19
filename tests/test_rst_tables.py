@@ -20,7 +20,7 @@ import os
 import unittest
 
 # Load test subjects
-from rst_tables import get_table_bounds, create_table, parse_table, \
+from rst_tables import get_table_bounds, reformat_table, parse_table, \
                           draw_table, table_line, get_column_widths, \
                           pad_fields, unify_table, join_rows
 
@@ -198,7 +198,7 @@ This is paragraph text *before* the table.
 This is paragraph text *after* the table, with
 a line ending.
 """.split('\n')
-        create_table()
+        reformat_table()
         self.assertEquals(expect, vim.current.buffer)
 
     def notestCreateComplexTable(self):

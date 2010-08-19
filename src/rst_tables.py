@@ -168,7 +168,7 @@ def draw_table(table):
 
 
 @bridged
-def create_table():
+def reformat_table():
     upper, lower = get_table_bounds()
     slice = vim.current.buffer[upper - 1:lower]
     table = parse_table(slice)
