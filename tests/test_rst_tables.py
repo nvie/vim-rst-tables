@@ -29,10 +29,13 @@ class TestRSTTableFormatter(unittest.TestCase):
     def setUp(self):
         # Default vim cursor for all tests is at line 4
         vim.current = mock.Mock()
-        vim.current.window.cursor = (4, 0)
+        self.set_vim_cursor(4, 0)
 
     def tearDown(self):
         del vim.current
+
+    def set_vim_cursor(self, row, col):
+        vim.current.window.cursor = (row, col)
 
     def read_fixture(self, name):
         return open(os.path.join('tests/fixtures/', name + '.txt'),
@@ -186,6 +189,5 @@ This is paragraph text *before* the table.
 This is paragraph text *after* the table, with
 a line ending.
 """.split('\n')
-        vim.current.window.cursor = (4, 10)
         create_table()
         self.assertEquals(expect, vim.current.buffer)
