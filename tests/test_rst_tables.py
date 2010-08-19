@@ -82,6 +82,38 @@ a line ending.
         expected = [['x', 'y'], ['a', 'b'], ['only one', '']]
         self.assertEquals(expected, parse_table(input))
 
+    def testParseValidTable(self):
+        input = ['+=====+====+',
+                 '| Foo | Mu |',
+                 '+=====+====+',
+                 '| x   | y  |',
+                 '+-----+----+']
+        expect = [['Foo', 'Mu'], ['x', 'y']]
+        self.assertEquals(expect, parse_table(input))
+
+    def testParseCorruptedTable(self):
+        input = ['+===+-----====+',
+                 '| Foo | Mu                   |',
+                 '+=====+====+',
+                 '| x   | This became somewhat larger  |',
+                 'blah   | A new line| ',
+                 '+-----+----+']
+        expect = [['Foo', 'Mu'],
+                  ['x', 'This became somewhat larger'],
+                  ['blah', 'A new line']]
+        self.assertEquals(expect, parse_table(input))
+
+        input = ['+===+-----====+',
+                 '| Foo | Mu                   |',
+                 '+=====+====+',
+                 '| x   | This became somewhat larger  |',
+                 'blah   | A new line|| ',
+                 '+-----+----+']
+        expect = [['Foo', 'Mu', ''],
+                  ['x', 'This became somewhat larger', ''],
+                  ['blah', 'A new line', '']]
+        self.assertEquals(expect, parse_table(input))
+
     def testTableLine(self):
         self.assertEquals('', table_line([], True))
         self.assertEquals('++', table_line([0], True))

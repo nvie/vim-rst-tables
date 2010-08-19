@@ -36,11 +36,19 @@ def unify_table(table):
     return output
 
 
+def split_table_row(row_string):
+    if row_string.find("|") >= 0:
+        # first, strip off the outer table drawings
+        row_string = re.sub(r'^\s*\||\|\s*$', '', row_string)
+        return re.split(r'\s*\|\s*', row_string.strip())
+    return re.split(r'\s\s+', row_string.rstrip())
+
+
 def parse_table(raw_lines):
-    mkfields = lambda line: re.split('\s\s+', line.rstrip())
-    output = map(mkfields, raw_lines)
-    output = unify_table(output)
-    return output
+    select_data_lines = lambda line: not re.match('^[\t +=-]+$', line)
+    lines = filter(select_data_lines, raw_lines)
+    lines = map(split_table_row, lines)
+    return unify_table(lines)
 
 
 def table_line(widths, header=False):
