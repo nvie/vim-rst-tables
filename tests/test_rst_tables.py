@@ -213,9 +213,12 @@ a line ending.
         reformat_table()
         self.assertEquals(expect, vim.current.buffer)
 
-    def notestCreateComplexTable(self):
+    def testCreateComplexTable(self):
         raw_lines = self.read_fixture('multiline-cells')
-        expect = """
+        # strip off the last (empty) line from raw_lines (since that line does
+        # not belong to the table
+        del raw_lines[-1]
+        expect = """\
 +================+===============================================================+
 | Feature        | Description                                                   |
 +================+===============================================================+
@@ -229,5 +232,5 @@ a line ending.
 +----------------+---------------------------------------------------------------+
 |                | habitasse platea dictumst. Phasellus pretium iaculis.         |
 +----------------+---------------------------------------------------------------+
-""".strip().split('\n')
+""".rstrip().split('\n')
         self.assertEquals(expect, draw_table(parse_table(raw_lines)))
