@@ -21,9 +21,10 @@ import unittest
 
 # Load test subjects
 from rst_tables import get_table_bounds, reformat_table, parse_table, \
-                          draw_table, table_line, get_column_widths, \
-                          pad_fields, unify_table, join_rows, \
-                          partition_raw_lines, split_row_into_lines
+             reflow_table, draw_table, table_line, get_column_widths, \
+             get_column_widths_from_border_spec, pad_fields, unify_table, \
+             join_rows, partition_raw_lines, split_row_into_lines, \
+             reflow_row_contents
 
 class TestRSTTableFormatter(unittest.TestCase):
 
@@ -210,6 +211,13 @@ class TestRSTTableFormatter(unittest.TestCase):
                 get_column_widths([['Foo\nBar\nQux',
                                     'This\nis\nreally\nneat!']]))
 
+    def testGetColumnWidthsFromBorderSpec(self):
+        input = ['+====+=====+==+=======+',
+                 '| xx | xxx |  | xxxxx |',
+                 '+====+=====+==+=======+']
+        self.assertEquals([2, 3, 0, 5],
+            get_column_widths_from_border_spec(input))
+
     def testPadFields(self):
         table = [['Name', 'Type', 'Description'],
                  ['Lollypop', 'Candy', 'Yummy'],
@@ -222,6 +230,23 @@ class TestRSTTableFormatter(unittest.TestCase):
         for input, expect in zip(table, expected_padding):
             self.assertEquals(expect, pad_fields(input, widths))
 
+    def testReflowRowContentsWithEnoughWidth(self):
+        input = ['Foo\nbar', 'This line\nis spread\nout over\nfour lines.']
+        expect = ['Foo bar', 'This line is spread out over four lines.']
+        self.assertEquals(expect, reflow_row_contents(input, [99,99]))
+
+    def testReflowRowContentsWithWrapping(self):
+        input = ['Foo\nbar', 'This line\nis spread\nout over\nfour lines.']
+        expect = ['Foo bar', 'This line is spread\nout over four lines.']
+        self.assertEquals(expect, reflow_row_contents(input, [10,20]))
+
+        input = ['Foo\nbar', 'This line\nis spread\nout over\nfour lines.']
+        expect = ['Foo bar', 'This\nline\nis\nspread\nout\nover\nfour\nlines.']
+        self.assertEquals(expect, reflow_row_contents(input, [10,6]))
+
+    def testReflowRowContentsWithoutRoom(self):
+        #self.assertEquals(expect, reflow_row_contents(input))
+        pass
 
     def testDrawTable(self):
         self.assertEquals([], draw_table([]))
@@ -235,6 +260,7 @@ class TestRSTTableFormatter(unittest.TestCase):
                  '| x   | y  |',
                  '+-----+----+'],
                 draw_table([['Foo', 'Mu'], ['x', 'y']]))
+
 
     def testCreateTable(self):
         self.load_fixture_in_vim('default')
@@ -278,3 +304,30 @@ a line ending.
 +----------------+---------------------------------------------------------------+
 """.rstrip().split('\n')
         self.assertEquals(expect, draw_table(parse_table(raw_lines)))
+
+    def testReflowTable(self):
+        self.load_fixture_in_vim('reflow')
+        expect = """\
+This is paragraph text *before* the table.
+
++==========+==========================+
+| Column 1 | Column 2                 |
++==========+==========================+
+| Foo      | Put two (or more) spaces |
+|          | as a field separator.    |
++----------+--------------------------+
+| Bar      | Even very very long      |
+|          | lines like these are     |
+|          | fine, as long as you do  |
+|          | not put in line endings  |
+|          | here.                    |
++----------+--------------------------+
+| Qux      | This is the last line.   |
++----------+--------------------------+
+
+This is paragraph text *after* the table, with
+a line ending.
+""".split('\n')
+        reflow_table()
+        self.assertEquals(expect, vim.current.buffer)
+

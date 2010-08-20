@@ -24,6 +24,9 @@ endpython
 " The default mapping is registered, unless the user remapped it already.
 if !exists("no_plugin_maps") && !exists("no_rst_table_maps")
     if !hasmapto('ReformatTable(')
-        noremap <silent> <leader><leader>f :call ReformatTable()<CR>
+        noremap <silent> <leader><leader>c :call ReformatTable()<CR>
+    endif
+    if !hasmapto('ReflowTable(')
+        noremap <silent> <leader><leader>f :call ReflowTable()<CR>
     endif
 endif

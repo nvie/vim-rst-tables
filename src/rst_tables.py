@@ -1,5 +1,6 @@
 import vim
 import re
+import textwrap
 from vim_bridge import bridged
 
 
@@ -172,6 +173,24 @@ def get_column_widths(table):
     return widths
 
 
+def get_column_widths_from_border_spec(slice):
+    border = None
+    for row in slice:
+        if line_is_separator(row):
+            border = row.strip()
+            break
+
+    if border is None:
+        raise RuntimeError('Cannot reflow this table. Top table border not found.')
+
+    left = right = None
+    if border[0] == '+':
+        left = 1
+    if border[-1] == '+':
+        right = -1
+    return map(lambda drawing: max(0, len(drawing) - 2), border[left:right].split('+'))
+
+
 def pad_fields(row, widths):
     """Pads fields of the given row, so each field lines up nicely with the
     others.
@@ -188,11 +207,22 @@ def pad_fields(row, widths):
     return new_row
 
 
-def draw_table(table):
+def reflow_row_contents(row, widths):
+    new_row = []
+    for i, field in enumerate(row):
+        wrapped_lines = textwrap.wrap(field.replace('\n', ' '), widths[i])
+        new_row.append("\n".join(wrapped_lines))
+    return new_row
+
+
+def draw_table(table, manual_widths=None):
     if table == []:
         return []
 
-    col_widths = get_column_widths(table)
+    if manual_widths is None:
+        col_widths = get_column_widths(table)
+    else:
+        col_widths = manual_widths
 
     # Reserve room for the spaces
     sep_col_widths = map(lambda x: x + 2, col_widths)
@@ -202,6 +232,9 @@ def draw_table(table):
     output = [header_line]
     first = True
     for row in table:
+
+        if manual_widths:
+            row = reflow_row_contents(row, manual_widths)
 
         row_lines = split_row_into_lines(row)
 
@@ -226,4 +259,14 @@ def reformat_table():
     slice = vim.current.buffer[upper - 1:lower]
     table = parse_table(slice)
     slice = draw_table(table)
+    vim.current.buffer[upper - 1:lower] = slice
+
+
+@bridged
+def reflow_table():
+    upper, lower = get_table_bounds()
+    slice = vim.current.buffer[upper - 1:lower]
+    widths = get_column_widths_from_border_spec(slice)
+    table = parse_table(slice)
+    slice = draw_table(table, widths)
     vim.current.buffer[upper - 1:lower] = slice
