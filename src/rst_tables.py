@@ -229,7 +229,7 @@ def draw_table(table, manual_widths=None):
     header_line = table_line(sep_col_widths, header=True)
     normal_line = table_line(sep_col_widths, header=False)
 
-    output = [header_line]
+    output = [normal_line]
     first = True
     for row in table:
 

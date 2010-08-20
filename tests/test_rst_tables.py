@@ -118,7 +118,7 @@ class TestRSTTableFormatter(unittest.TestCase):
         self.assertEquals(expected, parse_table(input))
 
     def testParseValidTable(self):
-        input = ['+=====+====+',
+        input = ['+-----+----+',
                  '| Foo | Mu |',
                  '+=====+====+',
                  '| x   | y  |',
@@ -127,7 +127,7 @@ class TestRSTTableFormatter(unittest.TestCase):
         self.assertEquals(expect, parse_table(input))
 
     def testParseCorruptedTable(self):
-        input = ['+===+-----====+',
+        input = ['+---+---------+',
                  '| Foo | Mu                   |',
                  '+=====+====+',
                  '| x   | This became somewhat larger  |',
@@ -137,7 +137,7 @@ class TestRSTTableFormatter(unittest.TestCase):
                   ['x\nblah', 'This became somewhat larger\nA new line']]
         self.assertEquals(expect, parse_table(input))
 
-        input = ['+===+-----====+',
+        input - ['+---+---------+',
                  '| Foo | Mu                   |',
                  '+=====+====+',
                  '| x   | This became somewhat larger  |',
@@ -149,7 +149,7 @@ class TestRSTTableFormatter(unittest.TestCase):
 
     def testParseMultiLineFields(self):
         input = """\
-+=====+=====================+
++-----+---------------------+
 | Foo | Bar                 |
 +=====+=====================+
 | x   | This is a long line |
@@ -175,7 +175,7 @@ class TestRSTTableFormatter(unittest.TestCase):
         input = [['Foo', 'Bar'],
                   ['x', 'This is a long line\nthat is spread out\nover multiple lines']]
         expect = """\
-+=====+=====================+
++-----+---------------------+
 | Foo | Bar                 |
 +=====+=====================+
 | x   | This is a long line |
@@ -212,7 +212,7 @@ class TestRSTTableFormatter(unittest.TestCase):
                                     'This\nis\nreally\nneat!']]))
 
     def testGetColumnWidthsFromBorderSpec(self):
-        input = ['+====+=====+==+=======+',
+        input = ['+----+-----+--+-------+',
                  '| xx | xxx |  | xxxxx |',
                  '+====+=====+==+=======+']
         self.assertEquals([2, 3, 0, 5],
@@ -250,11 +250,11 @@ class TestRSTTableFormatter(unittest.TestCase):
 
     def testDrawTable(self):
         self.assertEquals([], draw_table([]))
-        self.assertEquals(['+==+', '|  |', '+==+'], draw_table([['']]))
-        self.assertEquals(['+=====+', '| Foo |', '+=====+'],
+        self.assertEquals(['+--+', '|  |', '+==+'], draw_table([['']]))
+        self.assertEquals(['+-----+', '| Foo |', '+=====+'],
                 draw_table([['Foo']]))
         self.assertEquals(
-                ['+=====+====+',
+                ['+-----+----+',
                  '| Foo | Mu |',
                  '+=====+====+',
                  '| x   | y  |',
@@ -267,7 +267,7 @@ class TestRSTTableFormatter(unittest.TestCase):
         expect = """\
 This is paragraph text *before* the table.
 
-+==========+================================================================================================+
++----------+------------------------------------------------------------------------------------------------+
 | Column 1 | Column 2                                                                                       |
 +==========+================================================================================================+
 | Foo      | Put two (or more) spaces as a field separator.                                                 |
@@ -289,7 +289,7 @@ a line ending.
         # not belong to the table
         del raw_lines[-1]
         expect = """\
-+================+===============================================================+
++----------------+---------------------------------------------------------------+
 | Feature        | Description                                                   |
 +================+===============================================================+
 | Ease of use    | Drop dead simple!                                             |
@@ -310,7 +310,7 @@ a line ending.
         expect = """\
 This is paragraph text *before* the table.
 
-+==========+==========================+
++----------+--------------------------+
 | Column 1 | Column 2                 |
 +==========+==========================+
 | Foo      | Put two (or more) spaces |
