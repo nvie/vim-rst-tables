@@ -137,7 +137,7 @@ class TestRSTTableFormatter(unittest.TestCase):
                   ['x\nblah', 'This became somewhat larger\nA new line']]
         self.assertEquals(expect, parse_table(input))
 
-        input - ['+---+---------+',
+        input = ['+---+---------+',
                  '| Foo | Mu                   |',
                  '+=====+====+',
                  '| x   | This became somewhat larger  |',
