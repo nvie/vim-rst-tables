@@ -1,3 +1,6 @@
+vim-rst-tables ![Project status](http://stillmaintained.com/nvie/vim-rst-tables)
+==============
+
 Installation
 ------------
 1. Install the following packages from PyPI:
