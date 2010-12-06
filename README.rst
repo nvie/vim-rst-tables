@@ -1,5 +1,7 @@
-vim-rst-tables ![Project status](http://stillmaintained.com/nvie/vim-rst-tables)
+vim-rst-tables
 ==============
+
+.. image:: http://stillmaintained.com/nvie/vim-rst-tables
 
 Installation
 ------------
