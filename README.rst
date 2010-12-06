@@ -1,7 +1,7 @@
 vim-rst-tables
 ==============
 
-.. image:: http://stillmaintained.com/nvie/vim-rst-tables
+.. image:: http://stillmaintained.com/nvie/vim-rst-tables.png
 
 Installation
 ------------
