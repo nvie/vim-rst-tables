@@ -18,8 +18,16 @@ let loaded_rst_tables_ftplugin = 1
 
 python << endpython
 import vim
+import os
 import re
+import sys
 import textwrap
+
+# get the directory this script is in: the pyflakes python module should be installed there.
+scriptdir = os.path.join(os.path.dirname(vim.eval('expand("<sfile>")')), 'vim_bridge')
+if scriptdir not in sys.path:
+    sys.path.insert(0, scriptdir)
+
 from vim_bridge import bridged
 
 
