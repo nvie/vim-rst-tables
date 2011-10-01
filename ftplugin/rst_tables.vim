@@ -20,6 +20,7 @@ python << endpython
 import vim
 import re
 import textwrap
+import unicodedata
 from vim_bridge import bridged
 
 
@@ -160,8 +161,17 @@ def table_line(widths, header=False):
 
 
 def get_field_width(field_text):
-    return max(map(lambda s: len(s), field_text.split('\n')))
+    return max(map(get_string_width, field_text.split('\n')))
 
+def get_string_width(string):
+    width = 0
+    for char in list(string.decode('utf-8')):
+        eaw = unicodedata.east_asian_width(char)
+        if eaw == 'Na' or eaw == 'H':
+            width += 1
+        else:
+            width += 2
+    return width
 
 def split_row_into_lines(row):
     row = map(lambda field: field.split('\n'), row)
