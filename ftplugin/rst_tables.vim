@@ -238,8 +238,9 @@ def pad_fields(row, widths):
 def reflow_row_contents(row, widths):
     new_row = []
     for i, field in enumerate(row):
+        field = field.decode('utf-8')
         wrapped_lines = textwrap.wrap(field.replace('\n', ' '), widths[i])
-        new_row.append("\n".join(wrapped_lines))
+        new_row.append("\n".join(wrapped_lines).encode('utf-8'))
     return new_row
 
 
