@@ -24,9 +24,8 @@ Installation
 Usage
 -----
 1. Open a reStructuredText file
-2. Create some kind of table outline
+2. Create some kind of table outline::
 
-   .. code_block:: rst
       This is paragraph text *before* the table.
 
       Column 1  Column 2
@@ -38,9 +37,8 @@ Usage
 
 2. Put your cursor somewhere in the table.
 3. Press ``,,f`` (to create the table).  The output will look something like
-   this:
+   this::
 
-   .. code_block:: rst
       This is paragraph text *before* the table.
 
       +==========+=========================================================+
@@ -55,4 +53,3 @@ Usage
       +----------+---------------------------------------------------------+
 
       This is paragraph text *after* the table.
-
