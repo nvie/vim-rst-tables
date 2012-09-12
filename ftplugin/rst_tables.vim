@@ -253,7 +253,7 @@ def get_unicode(string):
 def reflow_row_contents(row, widths):
     new_row = []
     for i, field in enumerate(row):
-        string = get_unicode(field.replace('\n', ' '))
+        string = get_unicode(field.replace('\n', ''))
         wrapped_lines = wrap(string, widths[i])
         new_row.append("\n".join(wrapped_lines).encode('utf-8'))
     return new_row
