@@ -165,7 +165,7 @@ def get_field_width(field_text):
 
 def get_string_width(string):
     width = 0
-    for char in list(string.decode('utf-8')):
+    for char in list(get_unicode(string)):
         eaw = unicodedata.east_asian_width(char)
         if eaw == 'Na' or eaw == 'H':
             width += 1
@@ -225,24 +225,59 @@ def pad_fields(row, widths):
     others.
 
     """
-    widths = map(lambda w: ' %-' + str(w) + 's ', widths)
 
     # Pad all fields using the calculated widths
     new_row = []
     for i in range(len(row)):
         col = row[i]
-        col = widths[i] % col.strip()
+        col = ' ' + col.strip() + ' ';
+        diff = widths[i] + 2 - get_string_width(col)
+        for i in xrange(diff):
+            col = col + ' '
         new_row.append(col)
     return new_row
 
 
+def get_unicode(string):
+    result = string
+    try:
+        result = string.decode('utf-8')
+    except:
+        try:
+            result = string.decode('iso8859')
+        except:
+            pass
+
+    return result
+
 def reflow_row_contents(row, widths):
     new_row = []
     for i, field in enumerate(row):
-        wrapped_lines = textwrap.wrap(field.replace('\n', ' '), widths[i])
-        new_row.append("\n".join(wrapped_lines))
+        string = get_unicode(field.replace('\n', ' '))
+        wrapped_lines = wrap(string, widths[i])
+        new_row.append("\n".join(wrapped_lines).encode('utf-8'))
     return new_row
 
+def wrap(string, limit):
+    result = [];
+    width = 0;
+    char_width = 0;
+    segment = "";
+    for char in list(string):
+        eaw = unicodedata.east_asian_width(char)
+        if eaw == 'Na' or eaw == 'H':
+            char_width = 1
+        else:
+            char_width = 2
+        if (width + char_width) > limit:
+            result.append(segment)
+            segment = ""
+            width = 0
+        segment = segment + char
+        width += char_width
+    if width > 0:
+        result.append(segment)
+    return result
 
 def draw_table(table, manual_widths=None):
     if table == []:
