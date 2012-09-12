@@ -225,13 +225,15 @@ def pad_fields(row, widths):
     others.
 
     """
-    widths = map(lambda w: ' %-' + str(w) + 's ', widths)
 
     # Pad all fields using the calculated widths
     new_row = []
     for i in range(len(row)):
         col = row[i]
-        col = widths[i] % col.strip()
+        col = ' ' + col.strip() + ' ';
+        diff = widths[i] + 2 - get_string_width(col)
+        for i in xrange(diff):
+            col = col + ' '
         new_row.append(col)
     return new_row
 
