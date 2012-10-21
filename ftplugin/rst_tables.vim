@@ -28,7 +28,7 @@ def get_table_bounds():
     row, col = vim.current.window.cursor
     upper = lower = row
     try:
-        while vim.current.buffer[upper - 1].strip():
+        while vim.current.buffer[upper - 1].strip(): # find empty line upper
             upper -= 1
     except IndexError:
         pass
@@ -36,7 +36,7 @@ def get_table_bounds():
         upper += 1
 
     try:
-        while vim.current.buffer[lower - 1].strip():
+        while vim.current.buffer[lower - 1].strip(): # find empty line lower
             lower += 1
     except IndexError:
         pass
@@ -56,7 +56,7 @@ def join_rows(rows, sep='\n'):
         # grow output array, if necessary
         if len(output) <= len(row):
             for i in range(len(row) - len(output)):
-                output.extend([[]])
+                output.extend([[]]) # make len(output) same as len (raws) ??
 
         for i, field in enumerate(row):
             field_text = field.strip()
@@ -135,8 +135,8 @@ def split_table_row(row_string):
     if row_string.find("|") >= 0:
         # first, strip off the outer table drawings
         row_string = re.sub(r'^\s*\||\|\s*$', '', row_string)
-        return re.split(r'\s*\|\s*', row_string.strip())
-    return re.split(r'\s\s+', row_string.rstrip())
+        return re.split(r'\s*\|\s*', row_string.strip())        # split with space|space  , if line has '|'
+    return re.split(r'\s\s+', row_string.rstrip())              #more than two space
 
 
 def parse_table(raw_lines):
@@ -163,15 +163,22 @@ def table_line(widths, header=False):
 def get_field_width(field_text):
     return max(map(get_string_width, field_text.split('\n')))
 
-def get_string_width(string):
+
+ENC = 'utf8'
+from unicodedata import east_asian_width
+def cjk_width(text):
     width = 0
-    for char in list(string.decode('utf-8')):
-        eaw = unicodedata.east_asian_width(char)
-        if eaw == 'Na' or eaw == 'H':
+    if not isinstance(text, unicode):
+        text = text.decode(ENC)
+    for char in text:
+        if east_asian_width(char) in  ['Na', 'H']:
             width += 1
         else:
             width += 2
     return width
+
+def get_string_width(string):
+    return cjk_width(string)
 
 def split_row_into_lines(row):
     row = map(lambda field: field.split('\n'), row)
@@ -220,18 +227,35 @@ def get_column_widths_from_border_spec(slice):
     return map(lambda drawing: max(0, len(drawing) - 2), border[left:right].split('+'))
 
 
+#def pad_fields(row, widths):
+#    """Pads fields of the given row, so each field lines up nicely with the
+#    others.
+#
+#    """
+#    widths = map(lambda w: ' %-' + str(w) + 's ', widths)
+#
+#    # Pad all fields using the calculated widths
+#    new_row = []
+#    for i in range(len(row)):
+#        col = row[i]
+#        col = widths[i] % col.strip()
+#        new_row.append(col)
+#    return new_row
+
+# by ning:
 def pad_fields(row, widths):
     """Pads fields of the given row, so each field lines up nicely with the
     others.
 
     """
-    widths = map(lambda w: ' %-' + str(w) + 's ', widths)
+    #widths = map(lambda w: ' %-' + str(w) + 's ', widths)
 
     # Pad all fields using the calculated widths
     new_row = []
     for i in range(len(row)):
-        col = row[i]
-        col = widths[i] % col.strip()
+        col = row[i].strip()
+        padding = widths[i] - get_string_width(col) + 2
+        col = col + ' ' * padding
         new_row.append(col)
     return new_row
 
@@ -242,6 +266,14 @@ def reflow_row_contents(row, widths):
         wrapped_lines = textwrap.wrap(field.replace('\n', ' '), widths[i])
         new_row.append("\n".join(wrapped_lines))
     return new_row
+
+
+    #by ning
+def draw_text(table, manual_widths=None):
+    output = ['']
+    for row in table:
+        output.append('  '.join(row).replace('\n', ''))
+    return output
 
 
 def draw_table(table, manual_widths=None):
@@ -281,6 +313,13 @@ def draw_table(table, manual_widths=None):
 
     return output
 
+@bridged
+def clear_table():
+    upper, lower = get_table_bounds()
+    slice = vim.current.buffer[upper - 1:lower]
+    table = parse_table(slice)
+    slice = draw_text(table)
+    vim.current.buffer[upper - 1:lower] = slice
 
 @bridged
 def reformat_table():
@@ -310,5 +349,8 @@ if !exists("no_plugin_maps") && !exists("no_rst_table_maps")
     endif
     if !hasmapto('ReflowTable(')
         noremap <silent> <leader><leader>f :call ReflowTable()<CR>
+    endif
+    if !hasmapto('ClearTable(')
+        noremap <silent> <leader><leader>t :call ClearTable()<CR>
     endif
 endif
