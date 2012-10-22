@@ -43,7 +43,9 @@ def get_table_bounds():
     else:
         lower -= 1
 
-    return (upper, lower)
+    match = re.match('^(\s*).*$', vim.current.buffer[upper-1])
+
+    return (upper, lower, match.group(1))
 
 def join_rows(rows, sep='\n'):
     """Given a list of rows (a list of lists) this function returns a
@@ -244,7 +246,7 @@ def reflow_row_contents(row, widths):
     return new_row
 
 
-def draw_table(table, manual_widths=None):
+def draw_table(indent, table, manual_widths=None):
     if table == []:
         return []
 
@@ -258,7 +260,7 @@ def draw_table(table, manual_widths=None):
     header_line = table_line(sep_col_widths, header=True)
     normal_line = table_line(sep_col_widths, header=False)
 
-    output = [normal_line]
+    output = [indent+normal_line]
     first = True
     for row in table:
 
@@ -270,34 +272,34 @@ def draw_table(table, manual_widths=None):
         # draw the lines (num_lines) for this row
         for row_line in row_lines:
             row_line = pad_fields(row_line, col_widths)
-            output.append("|".join([''] + row_line + ['']))
+            output.append(indent+"|".join([''] + row_line + ['']))
 
         # then, draw the separator
         if first:
-            output.append(header_line)
+            output.append(indent+header_line)
             first = False
         else:
-            output.append(normal_line)
+            output.append(indent+normal_line)
 
     return output
 
 
 @bridged
 def reformat_table():
-    upper, lower = get_table_bounds()
+    upper, lower, indent = get_table_bounds()
     slice = vim.current.buffer[upper - 1:lower]
     table = parse_table(slice)
-    slice = draw_table(table)
+    slice = draw_table(indent, table)
     vim.current.buffer[upper - 1:lower] = slice
 
 
 @bridged
 def reflow_table():
-    upper, lower = get_table_bounds()
+    upper, lower, indent = get_table_bounds()
     slice = vim.current.buffer[upper - 1:lower]
     widths = get_column_widths_from_border_spec(slice)
     table = parse_table(slice)
-    slice = draw_table(table, widths)
+    slice = draw_table(indent, table, widths)
     vim.current.buffer[upper - 1:lower] = slice
 
 endpython
