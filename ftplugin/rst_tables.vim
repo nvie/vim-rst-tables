@@ -166,8 +166,11 @@ def get_field_width(field_text):
     return max(map(get_string_width, field_text.split('\n')))
 
 def get_string_width(string):
+        return get_unicode_width(string.decode('utf-8'))
+
+def get_unicode_width(string):
     width = 0
-    for char in list(string.decode('utf-8')):
+    for char in list(string):
         eaw = unicodedata.east_asian_width(char)
         if eaw == 'Na' or eaw == 'H':
             width += 1
@@ -227,22 +230,30 @@ def pad_fields(row, widths):
     others.
 
     """
-    widths = map(lambda w: ' %-' + str(w) + 's ', widths)
-
     # Pad all fields using the calculated widths
     new_row = []
     for i in range(len(row)):
-        col = row[i]
-        col = widths[i] % col.strip()
-        new_row.append(col)
+        col = row[i].strip()
+        col_width = get_string_width(col)
+        padded_col = col + ' ' * (widths[i] - col_width)
+        new_row.append(' ' + padded_col + ' ')
     return new_row
 
 
 def reflow_row_contents(row, widths):
     new_row = []
     for i, field in enumerate(row):
-        wrapped_lines = textwrap.wrap(field.replace('\n', ' '), widths[i])
-        new_row.append("\n".join(wrapped_lines))
+        field = field.decode('utf-8').replace('\n', ' ')
+        wrapped_lines = []
+        width = widths[i]
+        while width < get_unicode_width(field):
+            i = 0
+            while get_unicode_width(field[0:i+1]) <= width:
+                i += 1
+            wrapped_lines.append(field[0:i])
+            field = field[i:]
+        wrapped_lines.append(field)
+        new_row.append("\n".join(wrapped_lines).encode('utf-8'))
     return new_row
 
 
