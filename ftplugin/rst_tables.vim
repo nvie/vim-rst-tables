@@ -28,7 +28,7 @@ def get_table_bounds():
     row, col = vim.current.window.cursor
     upper = lower = row
     try:
-        while vim.current.buffer[upper - 1].strip():
+        while vim.current.buffer[upper - 1].strip() and upper > 0:
             upper -= 1
     except IndexError:
         pass
