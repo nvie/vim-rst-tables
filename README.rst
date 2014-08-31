@@ -23,6 +23,10 @@ Installation
 
 Usage
 -----
+
+Creating a new table
+~~~~~~~~~~~~~~~~~~~~
+
 1. Open a reStructuredText file
 2. Create some kind of table outline::
 
@@ -53,3 +57,16 @@ Usage
       +----------+---------------------------------------------------------+
 
       This is paragraph text *after* the table.
+
+
+Re-flowing an existing table
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Sometimes, you may have a column that contains enough data that your
+table is a little hard to work with.  To fix that kind of problem,
+you can define the column width you would prefer, and re-flow your table.
+
+1. Change the number of "==" signs in the top row of your table to match
+   the column widths you would prefer.
+2. Put your cursor somewhere in the table.
+3. Press ``,,f`` to re-flow the table.
