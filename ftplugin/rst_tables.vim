@@ -291,7 +291,6 @@ def reformat_table():
     encoding = vim.eval("&encoding")
     slice = map(lambda x: codecs.decode(x, encoding), \
     	vim.current.buffer[upper - 1:lower])
-    print 'encoding: ', encoding
     table = parse_table(slice)
     slice = draw_table(indent, table)
     vim.current.buffer[upper - 1:lower] = map(lambda x: \
