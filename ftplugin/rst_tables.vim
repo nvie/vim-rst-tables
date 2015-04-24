@@ -21,6 +21,7 @@ import vim
 import re
 import textwrap
 import unicodedata
+import codecs
 from vim_bridge import bridged
 
 
@@ -167,7 +168,7 @@ def get_field_width(field_text):
 
 def get_string_width(string):
     width = 0
-    for char in list(string.decode('utf-8')):
+    for char in list(string):
         eaw = unicodedata.east_asian_width(char)
         if eaw == 'Na' or eaw == 'H':
             width += 1
@@ -287,20 +288,27 @@ def draw_table(indent, table, manual_widths=None):
 @bridged
 def reformat_table():
     upper, lower, indent = get_table_bounds()
-    slice = vim.current.buffer[upper - 1:lower]
+    encoding = vim.eval("&encoding")
+    slice = map(lambda x: codecs.decode(x, encoding), \
+    	vim.current.buffer[upper - 1:lower])
+    print 'encoding: ', encoding
     table = parse_table(slice)
     slice = draw_table(indent, table)
-    vim.current.buffer[upper - 1:lower] = slice
+    vim.current.buffer[upper - 1:lower] = map(lambda x: \
+    	codecs.encode(x, encoding), slice)
 
 
 @bridged
 def reflow_table():
     upper, lower, indent = get_table_bounds()
-    slice = vim.current.buffer[upper - 1:lower]
+    encoding = vim.eval("&encoding")
+    slice = map(lambda x: codecs.decode(x, encoding), \
+    	vim.current.buffer[upper - 1:lower])
     widths = get_column_widths_from_border_spec(slice)
     table = parse_table(slice)
     slice = draw_table(indent, table, widths)
-    vim.current.buffer[upper - 1:lower] = slice
+    vim.current.buffer[upper - 1:lower] = map(lambda x: \
+    	codecs.encode(x, encoding), slice)
 
 endpython
 
