@@ -90,6 +90,7 @@ def partition_raw_lines(raw_lines):
     curr_part = []
     parts = [curr_part]
     for line in raw_lines:
+        line = line.encode('utf8')
         if line_is_separator(line):
             curr_part = []
             parts.append(curr_part)
@@ -234,7 +235,9 @@ def pad_fields(row, widths):
     new_row = []
     for i in range(len(row)):
         col = row[i]
+        col = col.decode('utf8')
         col = widths[i] % col.strip()
+        col = col.encode('utf8')
         new_row.append(col)
     return new_row
 
