@@ -40,8 +40,8 @@ Creating a new table
       This is paragraph text *after* the table.
 
 2. Put your cursor somewhere in the table.
-3. Press ``,,c`` (to create the table).  The output will look something like
-   this::
+3. To create the table, press ``,,c`` (or ``\\f`` if vim's <Leader> is set to
+   the default value).  The output will look something like this::
 
       This is paragraph text *before* the table.
 
@@ -66,7 +66,8 @@ Sometimes, you may have a column that contains enough data that your
 table is a little hard to work with.  To fix that kind of problem,
 you can define the column width you would prefer, and re-flow your table.
 
-1. Change the number of "==" signs in the top row of your table to match
+1. Change the number of "---" signs in the top row of your table to match
    the column widths you would prefer.
 2. Put your cursor somewhere in the table.
-3. Press ``,,f`` to re-flow the table.
+3. Press ``,,f`` to re-flow the table (or ``\\f`` if vim's <Leader> is set to
+   the default value; see also the :map command).
