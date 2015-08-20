@@ -16,10 +16,15 @@ Installation
        cd vim-rst-tables
 
 3. Make the project::
+
        python build.py
 
 4. Copy the file ``ftplugin/rst_tables.vim`` to your ``~/.vim/ftplugin``
-   directory
+   directory. If your vim is not already configured to source scripts
+   in this directory, make sure to add the appropriate command to your
+   .vimrc::
+
+        source "~/.vim/ftplugin/rst_tables.vim"
 
 .. _vim_bridge: http://pypi.python.org/pypi/vim_bridge
 
@@ -43,7 +48,7 @@ Creating a new table
       This is paragraph text *after* the table.
 
 2. Put your cursor somewhere in the table.
-3. To create the table, press ``,,c`` (or ``\\f`` if vim's <Leader> is set to
+3. To create the table, press ``,,c`` (or ``\\c`` if vim's <Leader> is set to
    the default value).  The output will look something like this::
 
       This is paragraph text *before* the table.
