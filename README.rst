@@ -3,6 +3,10 @@ vim-rst-tables
 
 .. image:: http://stillmaintained.com/nvie/vim-rst-tables.png
 
+.. contents:: **Contents**
+   :local:
+
+
 Installation
 ------------
 1. Install the following packages from PyPI:
@@ -22,7 +26,7 @@ Installation
 4. Copy the file ``ftplugin/rst_tables.vim`` to your ``~/.vim/ftplugin``
    directory. If your vim is not already configured to source scripts
    in this directory, make sure to add the appropriate command to your
-   .vimrc::
+   ``.vimrc``::
 
         source "~/.vim/ftplugin/rst_tables.vim"
 
@@ -48,12 +52,13 @@ Creating a new table
       This is paragraph text *after* the table.
 
 2. Put your cursor somewhere in the table.
-3. To create the table, press ``,,c`` (or ``\\c`` if vim's <Leader> is set to
-   the default value).  The output will look something like this::
+3. To create the table, press :kbd:`,,c` (or :kbd:`\\c` if vim's
+   :kbd:`&lt;Leader&gt;` is set to the default value).  The output will look
+   something like this::
 
       This is paragraph text *before* the table.
 
-      +==========+=========================================================+
+      +----------+---------------------------------------------------------+
       | Column 1 | Column 2                                                |
       +==========+=========================================================+
       | Foo      | Put two (or more) spaces as a field separator.          |
@@ -77,5 +82,6 @@ you can define the column width you would prefer, and re-flow your table.
 1. Change the number of "---" signs in the top row of your table to match
    the column widths you would prefer.
 2. Put your cursor somewhere in the table.
-3. Press ``,,f`` to re-flow the table (or ``\\f`` if vim's <Leader> is set to
-   the default value; see also the :map command).
+3. Press :kbd:`,,f` to re-flow the table (or :kbd:`\\f` if vim's
+   :kbd:`&lt;Leader&gt;` is set to the default value; see also the ``:map``
+   command).
