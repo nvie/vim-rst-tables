@@ -236,7 +236,6 @@ def pad_fields(row, widths):
     for i in range(len(row)):
         col = row[i]
         col = ' %s%s ' % (col.strip().encode('utf8'), ' ' * (widths[i] - get_string_width(col.strip())))
-        print "*"+col+"*", len(col)
         col = col.decode('utf8')
         new_row.append(col)
     return new_row
