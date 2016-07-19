@@ -241,10 +241,27 @@ def pad_fields(row, widths):
     return new_row
 
 
+def _textwrap(s, width):
+    #FIXME: this is a correct but slow implement
+    result = []
+    length = 0
+    temp = []
+    for c in s:
+        length += get_string_width(c)
+        if length >= width:
+            result.append(''.join(temp))
+            temp = [c]
+            length = get_string_width(c)
+        else:
+            temp.append(c)
+    result.append(''.join(temp))
+    return result
+
 def reflow_row_contents(row, widths):
     new_row = []
     for i, field in enumerate(row):
-        wrapped_lines = textwrap.wrap(field.replace('\n', ' '), widths[i])
+        field = field.decode('utf8')
+        wrapped_lines = _textwrap(field.replace('\n', ' '), widths[i])
         new_row.append("\n".join(wrapped_lines))
     return new_row
 
