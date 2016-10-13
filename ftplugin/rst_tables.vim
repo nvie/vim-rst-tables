@@ -17,19 +17,24 @@ endif
 let loaded_rst_tables_ftplugin = 1
 
 python << endpython
+#this source is copied here via build.py
+import sys
 import vim
 import re
 import textwrap
-import unicodedata
-import codecs
 from vim_bridge import bridged
 
+if sys.version_info[0] > 2:
+    mp = lambda x,y: list(map(x,y))
 
 def get_table_bounds():
+    """return (upper,lower,indent)
+
+    """
     row, col = vim.current.window.cursor
     upper = lower = row
     try:
-        while vim.current.buffer[upper - 1].strip() and upper > 0:
+        while vim.current.buffer[upper - 1].strip():
             upper -= 1
     except IndexError:
         pass
@@ -65,7 +70,7 @@ def join_rows(rows, sep='\n'):
             field_text = field.strip()
             if field_text:
                 output[i].append(field_text)
-    return map(lambda lines: sep.join(lines), output)
+    return mp(lambda lines: sep.join(lines), output)
 
 
 def line_is_separator(line):
@@ -85,12 +90,11 @@ def partition_raw_lines(raw_lines):
 
     """
     if not has_line_seps(raw_lines):
-        return map(lambda x: [x], raw_lines)
+        return mp(lambda x: [x], raw_lines)
 
     curr_part = []
     parts = [curr_part]
     for line in raw_lines:
-        line = line.encode('utf8')
         if line_is_separator(line):
             curr_part = []
             parts.append(curr_part)
@@ -98,7 +102,7 @@ def partition_raw_lines(raw_lines):
             curr_part.append(line)
 
     # remove any empty partitions (typically the first and last ones)
-    return filter(lambda x: x != [], parts)
+    return list(filter(lambda x: x != [], parts))
 
 
 def unify_table(table):
@@ -107,7 +111,7 @@ def unify_table(table):
     empty (i.e. all rows have that field empty), the column is removed.
 
     """
-    max_fields = max(map(lambda row: len(row), table))
+    max_fields = max(mp(lambda row: len(row), table))
     empty_cols = [True] * max_fields
     output = []
     for row in table:
@@ -145,7 +149,7 @@ def split_table_row(row_string):
 
 def parse_table(raw_lines):
     row_partition = partition_raw_lines(raw_lines)
-    lines = map(lambda row_string: join_rows(map(split_table_row, row_string)),
+    lines = mp(lambda row_string: join_rows(mp(split_table_row, row_string)),
                 row_partition)
     return unify_table(lines)
 
@@ -165,21 +169,12 @@ def table_line(widths, header=False):
 
 
 def get_field_width(field_text):
-    return max(map(get_string_width, field_text.split('\n')))
+    return max(mp(lambda s: len(s), field_text.split('\n')))
 
-def get_string_width(string):
-    width = 0
-    for char in list(string):
-        eaw = unicodedata.east_asian_width(char)
-        if eaw == 'Na' or eaw == 'H':
-            width += 1
-        else:
-            width += 2
-    return width
 
 def split_row_into_lines(row):
-    row = map(lambda field: field.split('\n'), row)
-    height = max(map(lambda field_lines: len(field_lines), row))
+    row = mp(lambda field: field.split('\n'), row)
+    height = max(mp(lambda field_lines: len(field_lines), row))
     turn_table = []
     for i in range(height):
         fields = []
@@ -221,7 +216,7 @@ def get_column_widths_from_border_spec(slice):
         left = 1
     if border[-1] == '+':
         right = -1
-    return map(lambda drawing: max(0, len(drawing) - 2), border[left:right].split('+'))
+    return mp(lambda drawing: max(0, len(drawing) - 2), border[left:right].split('+'))
 
 
 def pad_fields(row, widths):
@@ -229,15 +224,13 @@ def pad_fields(row, widths):
     others.
 
     """
-    widths = map(lambda w: ' %-' + str(w) + 's ', widths)
+    widths = mp(lambda w: ' %-' + str(w) + 's ', widths)
 
     # Pad all fields using the calculated widths
     new_row = []
     for i in range(len(row)):
         col = row[i]
-        col = col.decode('utf8')
         col = widths[i] % col.strip()
-        col = col.encode('utf8')
         new_row.append(col)
     return new_row
 
@@ -260,7 +253,7 @@ def draw_table(indent, table, manual_widths=None):
         col_widths = manual_widths
 
     # Reserve room for the spaces
-    sep_col_widths = map(lambda x: x + 2, col_widths)
+    sep_col_widths = mp(lambda x: x + 2, col_widths)
     header_line = table_line(sep_col_widths, header=True)
     normal_line = table_line(sep_col_widths, header=False)
 
@@ -291,26 +284,20 @@ def draw_table(indent, table, manual_widths=None):
 @bridged
 def reformat_table():
     upper, lower, indent = get_table_bounds()
-    encoding = vim.eval("&encoding")
-    slice = map(lambda x: codecs.decode(x, encoding), \
-    	vim.current.buffer[upper - 1:lower])
+    slice = vim.current.buffer[upper - 1:lower]
     table = parse_table(slice)
     slice = draw_table(indent, table)
-    vim.current.buffer[upper - 1:lower] = map(lambda x: \
-    	codecs.encode(x, encoding), slice)
+    vim.current.buffer[upper - 1:lower] = slice
 
 
 @bridged
 def reflow_table():
     upper, lower, indent = get_table_bounds()
-    encoding = vim.eval("&encoding")
-    slice = map(lambda x: codecs.decode(x, encoding), \
-    	vim.current.buffer[upper - 1:lower])
+    slice = vim.current.buffer[upper - 1:lower]
     widths = get_column_widths_from_border_spec(slice)
     table = parse_table(slice)
     slice = draw_table(indent, table, widths)
-    vim.current.buffer[upper - 1:lower] = map(lambda x: \
-    	codecs.encode(x, encoding), slice)
+    vim.current.buffer[upper - 1:lower] = slice
 
 endpython
 
@@ -318,9 +305,9 @@ endpython
 " The default mapping is registered, unless the user remapped it already.
 if !exists("no_plugin_maps") && !exists("no_rst_table_maps")
     if !hasmapto('ReformatTable(')
-        noremap <silent> <leader><leader>c :call ReformatTable()<CR>
+        noremap <silent> <leader><leader>o :call ReformatTable()<CR>
     endif
     if !hasmapto('ReflowTable(')
-        noremap <silent> <leader><leader>f :call ReflowTable()<CR>
+        noremap <silent> <leader><leader>l :call ReflowTable()<CR>
     endif
 endif

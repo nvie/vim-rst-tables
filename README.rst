@@ -52,7 +52,7 @@ Creating a new table
       This is paragraph text *after* the table.
 
 2. Put your cursor somewhere in the table.
-3. To create the table, press :kbd:`,,c` (or :kbd:`\\c` if vim's
+3. To create the table, press :kbd:`,,o` (or :kbd:`\\o` if vim's
    :kbd:`&lt;Leader&gt;` is set to the default value).  The output will look
    something like this::
 
@@ -82,6 +82,6 @@ you can define the column width you would prefer, and re-flow your table.
 1. Change the number of "---" signs in the top row of your table to match
    the column widths you would prefer.
 2. Put your cursor somewhere in the table.
-3. Press :kbd:`,,f` to re-flow the table (or :kbd:`\\f` if vim's
+3. Press :kbd:`,,l` to re-flow the table (or :kbd:`\\l` if vim's
    :kbd:`&lt;Leader&gt;` is set to the default value; see also the ``:map``
    command).

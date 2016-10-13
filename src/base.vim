@@ -17,6 +17,7 @@ endif
 let loaded_rst_tables_ftplugin = 1
 
 python << endpython
+#this source is copied here via build.py
 __PYTHON_SOURCE__
 endpython
 
@@ -24,9 +25,9 @@ endpython
 " The default mapping is registered, unless the user remapped it already.
 if !exists("no_plugin_maps") && !exists("no_rst_table_maps")
     if !hasmapto('ReformatTable(')
-        noremap <silent> <leader><leader>c :call ReformatTable()<CR>
+        noremap <silent> <leader><leader>o :call ReformatTable()<CR>
     endif
     if !hasmapto('ReflowTable(')
-        noremap <silent> <leader><leader>f :call ReflowTable()<CR>
+        noremap <silent> <leader><leader>l :call ReflowTable()<CR>
     endif
 endif
