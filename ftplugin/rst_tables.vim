@@ -16,7 +16,31 @@ if exists("g:loaded_rst_tables_ftplugin")
 endif
 let loaded_rst_tables_ftplugin = 1
 
-python << endpython
+" Default to Python 2
+let py_cmd_ver = 'python'
+let py_cmd_ver_other = 'python3'
+" Allow user to select Python 3
+if exists('g:rst_prefer_python_version') &&
+            \ g:rst_prefer_python_version == 3
+    let py_cmd_ver = 'python3'
+    let py_cmd_ver_other = 'python'
+endif
+if !has(py_cmd_ver)
+    let py_cmd_ver = py_cmd_ver_other
+    if !has(py_cmd_ver)
+        echoerr "Error: Requires Vim compiled with +python or +python3"
+        finish
+    endif
+endif
+
+if py_cmd_ver == 'python'
+    command! -nargs=1 Python python <args>
+else
+    command! -nargs=1 Python python3 <args>
+endif
+
+Python << endpython
+
 import vim
 
 import sys
