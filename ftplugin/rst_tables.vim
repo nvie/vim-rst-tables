@@ -18,6 +18,10 @@ let loaded_rst_tables_ftplugin = 1
 
 python << endpython
 import vim
+
+import sys
+PY2 = sys.version_info[0] < 2
+
 import re
 import textwrap
 import unicodedata
@@ -90,7 +94,6 @@ def partition_raw_lines(raw_lines):
     curr_part = []
     parts = [curr_part]
     for line in raw_lines:
-        line = line.encode('utf8')
         if line_is_separator(line):
             curr_part = []
             parts.append(curr_part)
@@ -237,10 +240,7 @@ def pad_fields(row, widths):
     # Pad all fields using the calculated widths
     new_row = []
     for i in range(len(row)):
-        col = row[i]
-        col = col.decode('utf8')
-        col = widths[i] % col.strip()
-        col = col.encode('utf8')
+        col = widths[i] % row[i].strip()
         new_row.append(col)
     return new_row
 
@@ -291,29 +291,38 @@ def draw_table(indent, table, manual_widths=None):
     return output
 
 
+def proc_table(func):
+    upper, lower, indent = get_table_bounds()
+    table_txt = vim.current.buffer[upper - 1:lower]
+    if PY2:
+        encoding = vim.eval("&encoding")
+        table_txt = [codecs.decode(x, encoding) for x in table_txt]
+    table_txt = func(indent, table_txt)
+    if PY2:
+        table_txt = [codecs.encode(x, encoding) for x in table_txt]
+    vim.current.buffer[upper - 1:lower] = table_txt
+
+
+def _reformat(indent, table_txt):
+    table = parse_table(table_txt)
+    return draw_table(indent, table)
+
+
 @bridged
 def reformat_table():
-    upper, lower, indent = get_table_bounds()
-    encoding = vim.eval("&encoding")
-    slice = [codecs.decode(x, encoding)
-             for x in vim.current.buffer[upper - 1:lower]]
-    table = parse_table(slice)
-    slice = draw_table(indent, table)
-    vim.current.buffer[upper - 1:lower] = [codecs.encode(x, encoding)
-                                           for x in slice]
+    proc_table(_reformat)
+
+
+def _reflow(indent, table_txt):
+    widths = get_column_widths_from_border_spec(table_txt)
+    table = parse_table(table_txt)
+    return draw_table(indent, table, widths)
 
 
 @bridged
 def reflow_table():
-    upper, lower, indent = get_table_bounds()
-    encoding = vim.eval("&encoding")
-    slice = [codecs.decode(x, encoding)
-             for x in vim.current.buffer[upper - 1:lower]]
-    widths = get_column_widths_from_border_spec(slice)
-    table = parse_table(slice)
-    slice = draw_table(indent, table, widths)
-    vim.current.buffer[upper - 1:lower] = [codecs.encode(x, encoding)
-                                           for x in slice]
+    proc_table(_reflow)
+
 
 endpython
 
