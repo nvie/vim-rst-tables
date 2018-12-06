@@ -46,6 +46,12 @@ import vim
 import sys
 PY2 = sys.version_info[0] < 2
 
+from os.path import dirname, join as pjoin
+
+# get the directory this script is in: the vim_bridge python module should be installed there.
+our_pth = dirname(vim.eval('expand("<sfile>")'))
+sys.path.insert(0, pjoin(our_pth, 'vim_bridge'))
+
 import re
 import textwrap
 import unicodedata

@@ -1,0 +1,3 @@
+[submodule "ftplugin/vim_bridge"]
+	path = ftplugin/vim_bridge
+	url = https://github.com/nvie/vim_bridge
