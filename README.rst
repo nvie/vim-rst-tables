@@ -19,10 +19,6 @@ Installation
        git clone git://github.com/nvie/vim-rst-tables.git
        cd vim-rst-tables
 
-3. Make the project::
-
-       python build.py
-
 4. Copy the file ``ftplugin/rst_tables.vim`` to your ``~/.vim/ftplugin``
    directory. If your vim is not already configured to source scripts
    in this directory, make sure to add the appropriate command to your
